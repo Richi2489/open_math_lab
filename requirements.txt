@@ -1,5 +1,6 @@
 numpy
 scipy
 matplotlib
+mpmath
 pytest
 # numba  # opcional: descomenta para acelerar tiempos de parada sobre valores en int64

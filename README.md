@@ -116,3 +116,32 @@ Las gráficas se guardan en `outputs/` (ignorada por git).
 - Las funciones escalares usan enteros de Python de precisión arbitraria (sin riesgo de
   desbordamiento); las versiones vectorizadas con numpy usan `int64` y están pensadas
   para muestreo estadístico con valores acotados.
+
+---
+
+# Lab: Riemann Statistical Lab
+
+Laboratorio estadístico reproducible de la conexión **Montgomery–Odlyzko**.
+
+> **NO es proof-hunting de la Hipótesis de Riemann.** La pregunta de la iteración 1:
+> ¿los gaps normalizados (*unfolded*) de los ceros no triviales de ζ exhiben **repulsión
+> tipo GUE**, contrastados contra GUE finito simulado y contra Poisson? El confounder
+> central aquí es el **unfolding** (el análogo de la magnitud en Collatz): normalizar por
+> la media global, en vez de por la densidad local `N(T)`, fabrica artefactos de escala.
+
+- Plan y **regla anti-autoengaño pre-registrada**: [`docs/riemann_lab_plan.md`](docs/riemann_lab_plan.md)
+- Reporte de la iteración 1: [`docs/spacing_replication_report.md`](docs/spacing_replication_report.md)
+
+**Resultado iteración 1:** repulsión tipo GUE **reproducida limpiamente** en las tres
+métricas (espaciados de vecino más cercano vs sorpresa de Wigner; KS/Wasserstein mucho
+más cerca de GUE que de Poisson; correlación de pares R₂ con el hoyo de repulsión en
+`r→0`). El residuo frente al GUE asintótico es compatible con tamaño finito / baja altura.
+
+```powershell
+# Réplica (N=2000 ceros; la 1ª vez computa con mpmath ~6 min y cachea en data/)
+python scripts/run_spacing_replication.py --n-ceros 2000
+python scripts/run_spacing_replication.py --rapido   # versión chica
+```
+
+Los ceros se cachean en `data/` (incremental: no se recomputan). Hay un hook dejado para
+ingerir tablas de Odlyzko de alta altura `T` en una iteración futura (sin descargas aún).
