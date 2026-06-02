@@ -88,3 +88,19 @@ def test_primeros_ceros_conocidos():
 def test_validar_ceros_detecta_no_monotono():
     with pytest.raises(ValueError):
         zeros.validar_ceros(np.array([14.0, 13.0, 21.0]))
+
+
+# ---------------------------------------------------------------------------
+# Unfolding exacto (theta de Riemann-Siegel)
+# ---------------------------------------------------------------------------
+def test_theta_unfold_cerca_de_asintotico():
+    # A alturas moderadas, θ/π+1 y la forma asintótica coinciden a ~1e-3.
+    T = np.array([100.0, 500.0, 1500.0])
+    assert np.max(np.abs(spacing.theta_unfold(T) - spacing.N_suave(T))) < 1e-2
+
+
+def test_unfold_exacto_gaps_media_uno():
+    # Round-trip sobre ceros reales: los gaps unfolded exactos tienen media ≈ 1.
+    w = zeros.cargar_unfold_exacto(60)
+    s = np.diff(w)
+    assert abs(s.mean() - 1.0) < 0.05

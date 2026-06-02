@@ -48,8 +48,22 @@ def N_suave_inversa(w, t_max=1e7):
 
 
 def unfold(gammas: np.ndarray) -> np.ndarray:
-    """Unfold por densidad local: w_n = N_suave(γ_n)."""
+    """Unfold por densidad local (asintótico): w_n = N_suave(γ_n)."""
     return N_suave(np.asarray(gammas, dtype=np.float64))
+
+
+def theta_unfold(gammas: np.ndarray) -> np.ndarray:
+    """Unfold EXACTO: w_n = θ(γ_n)/π + 1 (Riemann–Siegel, vía mpmath).
+
+    Versión directa (sin caché), pensada para pocos valores / tests. Para muestras
+    grandes usar `riemann.zeros.cargar_unfold_exacto`, que cachea.
+    """
+    import mpmath
+
+    return np.array(
+        [float(mpmath.siegeltheta(mpmath.mpf(float(g))) / mpmath.pi + 1)
+         for g in np.atleast_1d(np.asarray(gammas, dtype=np.float64))]
+    )
 
 
 def gaps_vecino(gammas: np.ndarray) -> np.ndarray:

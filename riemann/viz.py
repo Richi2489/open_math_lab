@@ -87,6 +87,27 @@ def pares_r2(centros, r2_emp, ruta="outputs/riemann_r2.png") -> str:
     return ruta
 
 
+def tendencia_altura(centros_T, var_gap, ks, ruta="outputs/riemann_tendencia_altura.png") -> str:
+    """Dos paneles: |brecha de varianza ζ−GUE| y KS(ζ vs GUE) por cuartil de altura.
+    Si la brecha encoge al subir T, es efecto de altura finita."""
+    _asegurar_dir(ruta)
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.5))
+    a1.plot(centros_T, var_gap, "o-", color="#3b6ea5", lw=1.6)
+    a1.set_xlabel("altura T (centro de cuartil)")
+    a1.set_ylabel("|var(ζ) − var(GUE)|")
+    a1.set_title("Brecha de varianza vs altura")
+    a1.grid(True, alpha=0.3)
+    a2.plot(centros_T, ks, "o-", color="#5a9367", lw=1.6)
+    a2.set_xlabel("altura T (centro de cuartil)")
+    a2.set_ylabel("KS(ζ vs GUE)")
+    a2.set_title("KS vs altura")
+    a2.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
 def estabilidad_altura(estab, ruta="outputs/riemann_estabilidad.png") -> str:
     """KS(ζ vs GUE) por ventana de altura T (¿estable o efecto de tamaño finito?)."""
     _asegurar_dir(ruta)

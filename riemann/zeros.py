@@ -24,6 +24,7 @@ import numpy as np
 _DIR_DATOS = Path(__file__).resolve().parents[1] / "data"
 _CACHE = _DIR_DATOS / "zeta_zeros_im.npy"
 _META = _DIR_DATOS / "zeta_zeros_meta.json"
+_CACHE_UNFOLD = _DIR_DATOS / "zeta_unfold_exacto.npy"  # w_n = θ(γ_n)/π + 1
 _DPS = 25  # dígitos de precisión de mpmath; sobra para γ hasta ~10^4
 
 
@@ -58,6 +59,36 @@ def cargar_ceros(n: int, dps: int = _DPS, verbose: bool = False) -> np.ndarray:
     _DIR_DATOS.mkdir(exist_ok=True)
     np.save(_CACHE, todos)
     _META.write_text(json.dumps({"n": int(len(todos)), "dps": dps}), encoding="utf-8")
+    return todos[:n].copy()
+
+
+def cargar_unfold_exacto(n: int, dps: int = _DPS, verbose: bool = False) -> np.ndarray:
+    """Unfolding EXACTO de los primeros n ceros: w_n = θ(γ_n)/π + 1, con θ la función
+    de Riemann–Siegel (`mpmath.siegeltheta`). Es la parte suave EXACTA del contador de
+    ceros, frente a la forma asintótica `spacing.N_suave`.
+
+    Se cachea de forma incremental en `data/` (paralelo al caché de ceros).
+    """
+    if n < 1:
+        raise ValueError("n debe ser >= 1.")
+    gammas = cargar_ceros(n, dps=dps)
+    cache = np.load(_CACHE_UNFOLD) if _CACHE_UNFOLD.exists() else np.empty(0, dtype=np.float64)
+    if len(cache) >= n:
+        return cache[:n].copy()
+
+    import mpmath
+
+    mpmath.mp.dps = dps
+    nuevos = []
+    for k in range(len(cache), n):  # índice 0-based en gammas
+        T = mpmath.mpf(float(gammas[k]))
+        nuevos.append(float(mpmath.siegeltheta(T) / mpmath.pi + 1))
+        if verbose and ((k + 1) % 200 == 0 or k + 1 == n):
+            print(f"    θ exacta: {k + 1}/{n}")
+    todos = np.concatenate([cache, np.array(nuevos, dtype=np.float64)])
+
+    _DIR_DATOS.mkdir(exist_ok=True)
+    np.save(_CACHE_UNFOLD, todos)
     return todos[:n].copy()
 
 
