@@ -7,6 +7,17 @@ Laboratorio empírico de investigación sobre la **conjetura de Collatz**.
 > probabilística del 3/4** y, sobre todo, **cuantificar la dependencia entre pasos**:
 > la heurística clásica asume que los pasos son independientes, y no lo son.
 
+## Estado del proyecto
+
+La hipótesis investigada (una autocorrelación de **lag-1 positiva** como señal de
+correlación de corto alcance) se **cerró** tras una falsación con regla pre-registrada y
+un des-confound magnitud-vs-longitud: el efecto decae hacia cero y es un artefacto de
+tamaño finito, no señal nueva. Es un **resultado negativo bien hecho**, reproducible.
+
+- Post-mortem (arco completo y honesto): [`docs/collatz_lag1_closure.md`](docs/collatz_lag1_closure.md)
+- Decisión formal (ADR): [`docs/decisions/0001-cierre-veta-lag1.md`](docs/decisions/0001-cierre-veta-lag1.md)
+- Reportes reproducibles: [`docs/iteracion2_reporte.md`](docs/iteracion2_reporte.md), [`docs/confirmatorio_reporte.md`](docs/confirmatorio_reporte.md)
+
 ## La pregunta de la iteración 1
 
 El mapa acelerado sobre los impares es
