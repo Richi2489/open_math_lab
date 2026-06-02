@@ -146,6 +146,80 @@ def comparar_datasets(etiquetas, valores, ruta, ylabel="Wasserstein(ζ vs GUE)")
     return ruta
 
 
+def silueta_conteo(t_zeros, ruta, n_zeros=400) -> str:
+    """A.1: escalera real N(t)=#{t_n≤t} de los ceros vs el conteo semiclásico de xp
+    (= parte suave de Riemann–von Mangoldt). Coinciden en promedio → la SILUETA."""
+    from . import spacing
+    _asegurar_dir(ruta)
+    t = np.sort(np.asarray(t_zeros, dtype=np.float64))[:n_zeros]
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.step(t, np.arange(1, len(t) + 1), where="post", color="#3b6ea5", lw=1.2,
+            label="escalera real N(t) de los ceros")
+    tt = np.linspace(t[0], t[-1], 400)
+    ax.plot(tt, spacing.N_suave(tt), "-", color="#a5483b", lw=1.8,
+            label="conteo semiclásico de xp = N_suave(T)")
+    ax.set_xlabel("T"); ax.set_ylabel("N(T)")
+    ax.set_title("A.1 — xp reproduce la densidad suave (silueta)")
+    ax.legend(); ax.grid(True, alpha=0.3)
+    fig.tight_layout(); fig.savefig(ruta, dpi=130); plt.close(fig)
+    return ruta
+
+
+def peine_xp(niveles, L, ruta) -> str:
+    """A.2: los autovalores positivos del generador de dilatación discretizado:
+    un peine ~uniforme E_n ≈ 2πn/L."""
+    _asegurar_dir(ruta)
+    niveles = np.sort(np.asarray(niveles, dtype=np.float64))
+    n = np.arange(1, len(niveles) + 1)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(n, niveles, "o", color="#5a9367", ms=3, label="autovalores xp (caja)")
+    ax.plot(n, 2 * np.pi * n / L, "-", color="#999999", lw=1,
+            label="2πn/L (peine uniforme)")
+    ax.set_xlabel("n"); ax.set_ylabel("E_n")
+    ax.set_title("A.2 — espectro del generador de dilatación: peine uniforme")
+    ax.legend(); ax.grid(True, alpha=0.3)
+    fig.tight_layout(); fig.savefig(ruta, dpi=130); plt.close(fig)
+    return ruta
+
+
+def niveles_vs_zeros(t_zeros, ruta, n_mostrar=400) -> str:
+    """A.3a: t_n reales vs un peine uniforme escalado al mismo rango. El peine es la
+    cuerda recta; los ceros se curvan (densidad creciente) → DIVERGEN."""
+    _asegurar_dir(ruta)
+    t = np.sort(np.asarray(t_zeros, dtype=np.float64))[:n_mostrar]
+    n = np.arange(1, len(t) + 1)
+    peine = t[0] + (t[-1] - t[0]) * (n - 1) / (len(t) - 1)  # comb lineal mismo rango
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(n, t, "-", color="#3b6ea5", lw=1.5, label="ceros de ζ: t_n")
+    ax.plot(n, peine, "--", color="#5a9367", lw=1.5, label="peine xp uniforme (mismo rango)")
+    ax.set_xlabel("n"); ax.set_ylabel("valor")
+    ax.set_title("A.3 — niveles individuales: xp (recto) vs t_n (curvado) divergen")
+    ax.legend(); ax.grid(True, alpha=0.3)
+    fig.tight_layout(); fig.savefig(ruta, dpi=130); plt.close(fig)
+    return ruta
+
+
+def espaciados_xp(s_xp, s_gue, s_zeta, ruta) -> str:
+    """A.3b: distribución de espaciados. xp = pico rígido en s≈1 (picket-fence); GUE y
+    ζ siguen la sorpresa de Wigner con repulsión. xp NO genera estadística GUE."""
+    from . import gue, metrics
+    _asegurar_dir(ruta)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    cg, dg = metrics.histograma(s_gue)
+    ax.plot(cg, dg, "-", color="#5a9367", lw=1.4, label="GUE")
+    cz, dz = metrics.histograma(s_zeta)
+    ax.plot(cz, dz, "o-", color="#3b6ea5", ms=3, lw=1.1, label="ζ (ceros)")
+    xx = np.linspace(0, 4, 300)
+    ax.plot(xx, gue.wigner_gue(xx), ":", color="#a5483b", lw=1.5, label="Wigner GUE")
+    ax.axvline(float(np.mean(s_xp)), color="#d6a04c", lw=2.2,
+               label="xp: pico rígido en s≈1 (sin repulsión)")
+    ax.set_xlabel("espaciado normalizado s"); ax.set_ylabel("densidad P(s)")
+    ax.set_title("A.3 — estadística de espaciados: xp ≠ GUE")
+    ax.legend(); ax.grid(True, alpha=0.3); ax.set_xlim(0, 4)
+    fig.tight_layout(); fig.savefig(ruta, dpi=130); plt.close(fig)
+    return ruta
+
+
 def tendencia_altura(centros_T, var_gap, ks, ruta="outputs/riemann_tendencia_altura.png") -> str:
     """Dos paneles: |brecha de varianza ζ−GUE| y KS(ζ vs GUE) por cuartil de altura.
     Si la brecha encoge al subir T, es efecto de altura finita."""
