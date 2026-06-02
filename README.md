@@ -1,13 +1,38 @@
-# open_math_lab — Collatz
+# open_math_lab
 
-Laboratorio empírico de investigación sobre la **conjetura de Collatz**.
+**Un laboratorio de *método*: cómo investigar una heurística matemática sin
+autoengañarse.**
+
+Este repositorio no persigue demostrar teoremas ni cazar contraejemplos. Toma señales
+empíricas en objetos matemáticos clásicos y las somete a una disciplina de falsación:
+hipótesis explícita, **regla de decisión pre-registrada** (escrita *antes* de ver los
+resultados), corrección de sesgos de muestra finita, pruebas de permutación, y un cuidado
+obsesivo por los **confounders** — esos efectos de escala que fabrican "señales" que en
+realidad son artefactos. El producto típico es un **resultado negativo bien hecho y
+reproducible**, que vale tanto como uno positivo cuando el método es honesto.
+
+Cada subcarpeta-paquete es un "lab" independiente con su propia pregunta, sus scripts
+reproducibles (semilla fija) y su reporte en `docs/`.
+
+## Labs
+
+| Lab | Pregunta | Estado |
+|-----|----------|--------|
+| [`collatz/`](collatz/) | ¿Hay dependencia de corto alcance (lag-1) en la dinámica impar de Collatz, más allá de la heurística i.i.d.? | **Cerrado** — artefacto de tamaño finito (ver abajo) |
+| [`riemann/`](riemann/) | ¿Reproducimos limpiamente la repulsión tipo GUE (Montgomery–Odlyzko) en los gaps *unfolded* de los ceros de ζ? | Iteración 1 |
+
+---
+
+# Lab: Collatz
+
+Laboratorio empírico sobre la **conjetura de Collatz**.
 
 > **El objetivo NO es buscar contraejemplos.** La conjetura está verificada por
 > supercómputo hasta 2^71. El objetivo es **medir empíricamente la heurística
 > probabilística del 3/4** y, sobre todo, **cuantificar la dependencia entre pasos**:
 > la heurística clásica asume que los pasos son independientes, y no lo son.
 
-## Estado del proyecto
+## Estado del lab Collatz
 
 La hipótesis investigada (una autocorrelación de **lag-1 positiva** como señal de
 correlación de corto alcance) se **cerró** tras una falsación con regla pre-registrada y
@@ -18,7 +43,7 @@ tamaño finito, no señal nueva. Es un **resultado negativo bien hecho**, reprod
 - Decisión formal (ADR): [`docs/decisions/0001-cierre-veta-lag1.md`](docs/decisions/0001-cierre-veta-lag1.md)
 - Reportes reproducibles: [`docs/iteracion2_reporte.md`](docs/iteracion2_reporte.md), [`docs/confirmatorio_reporte.md`](docs/confirmatorio_reporte.md)
 
-## La pregunta de la iteración 1
+## La pregunta de la iteración 1 (Collatz)
 
 El mapa acelerado sobre los impares es
 
