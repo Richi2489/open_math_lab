@@ -181,3 +181,63 @@ def distribucion_v(v_concat, ruta="outputs/it2_dist_v.png", k_max=12) -> str:
     fig.savefig(ruta, dpi=130)
     plt.close(fig)
     return ruta
+
+
+# ===========================================================================
+# Figuras del experimento confirmatorio (des-confundir bits vs L)
+# ===========================================================================
+def lag1_fijo_L_con_ajustes(centros_bits, y, err, ajuste, ruta, titulo) -> str:
+    """lag-1(bits | L fijo) con barras de error y los dos ajustes de asíntota."""
+    _asegurar_dir(ruta)
+    x = np.asarray(centros_bits, dtype=np.float64)
+    y = np.asarray(y, dtype=np.float64)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.errorbar(x, y, yerr=err, fmt="o", color="#3b6ea5", capsize=4, lw=1.5,
+                label="lag-1 corregido (L fija)", zorder=3)
+    ax.axhline(0.0, color="black", lw=0.8)
+
+    xx = np.linspace(x.min(), x.max(), 200)
+    x0 = xx - ajuste["x_min"]
+    mc = ajuste.get("modelo_cero", {})
+    mk = ajuste.get("modelo_const", {})
+    if "params" in mc:
+        a, k = mc["params"]
+        ax.plot(xx, a * np.exp(-k * x0), "--", color="#a5483b",
+                label=f"(a) → 0  (AIC {mc['aic']:.1f})")
+    if "params" in mk:
+        c, a, k = mk["params"]
+        ax.plot(xx, c + a * np.exp(-k * x0), "-", color="#5a9367",
+                label=f"(b) → {c:+.4f}  (AIC {mk['aic']:.1f})")
+        ax.axhline(c, color="#5a9367", ls=":", lw=1,
+                   label=f"asíntota c = {c:+.4f}")
+    ax.set_xlabel("bits del arranque (centro de banda)")
+    ax.set_ylabel("lag-1 corregido")
+    ax.set_title(titulo)
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
+def supervivencia_multilag(por_lag, ruta="outputs/conf_multilag.png") -> str:
+    """Por lag: ACF corregido (observado − nulo) con marca de significancia."""
+    _asegurar_dir(ruta)
+    lags = sorted(por_lag)
+    corr = [por_lag[k]["corregido"] for k in lags]
+    sig = [por_lag[k]["significativo"] for k in lags]
+    colores = ["#3b6ea5" if s else "#bbbbbb" for s in sig]
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.bar(lags, corr, color=colores)
+    ax.axhline(0.0, color="black", lw=0.8)
+    ax.set_xlabel("lag")
+    ax.set_ylabel("ACF corregido (observado − nulo)")
+    ax.set_title("Estructura multi-lag que sobrevive a la permutación\n"
+                 "(azul = significativo; gris = no)")
+    ax.set_xticks(lags)
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta

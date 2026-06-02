@@ -73,6 +73,37 @@ def muestrear_banda(
     return secuencias, np.array(longitudes, dtype=np.int64), n_eff, descartadas
 
 
+def muestrear_banda_por_conteo(
+    banda: tuple[int, int],
+    n_trayectorias: int,
+    rng: random.Random,
+    min_L: int = 11,
+):
+    """Muestrea EXACTAMENTE `n_trayectorias` válidas (L >= min_L) de la banda de bits.
+
+    A diferencia de `muestrear_banda` (que fija N_eff), aquí se fija el número de
+    trayectorias. Se usa para guardar un mismo presupuesto de trayectorias por banda
+    y luego reanalizar a longitud L fija (des-confundir magnitud de largo).
+
+    Devuelve (secuencias, longitudes, n_descartadas_por_corto).
+    """
+    lo, hi = banda
+    secuencias: list[np.ndarray] = []
+    longitudes: list[int] = []
+    descartadas = 0
+    while len(secuencias) < n_trayectorias:
+        b = rng.randint(lo, hi)
+        n = semilla_impar_de_bits(b, rng)
+        vs = secuencia_v(n, max_iter=_MAX_ITER)
+        L = len(vs)
+        if L < min_L:
+            descartadas += 1
+            continue
+        secuencias.append(vs.astype(np.int16))
+        longitudes.append(L)
+    return secuencias, np.array(longitudes, dtype=np.int64), descartadas
+
+
 def bucket_de_longitud(L: int) -> str:
     """Etiqueta del bucket de longitud al que pertenece L."""
     for etiqueta, lo, hi in BUCKETS_L:

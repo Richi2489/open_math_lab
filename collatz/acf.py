@@ -116,7 +116,8 @@ def acf_agregado(secuencias, max_lag: int) -> dict:
 # ---------------------------------------------------------------------------
 # Prueba de permutación (PRINCIPAL)
 # ---------------------------------------------------------------------------
-def prueba_permutacion(secuencias, lags, B: int = 1000, rng=None) -> dict:
+def prueba_permutacion(secuencias, lags, B: int = 1000, rng=None,
+                       devolver_nulo: bool = False) -> dict:
     """Distribución nula empírica del ACF agregado por permutación.
 
     Para cada trayectoria se permuta aleatoriamente su secuencia de v's (lo que
@@ -131,6 +132,9 @@ def prueba_permutacion(secuencias, lags, B: int = 1000, rng=None) -> dict:
         p_dos_colas   : p-valor empírico de dos colas (centrado en nulo_media).
         p_una_cola_sup: p-valor empírico de una cola (H1: rho_k > nulo).
         significativo : observado fuera de [p2_5, p97_5].
+
+    Si `devolver_nulo=True`, añade además la clave especial '_nulo': {k: array(B)}
+    con la distribución nula completa del rho_k agregado (para análisis de energía).
     """
     if rng is None:
         rng = np.random.default_rng()
@@ -171,11 +175,13 @@ def prueba_permutacion(secuencias, lags, B: int = 1000, rng=None) -> dict:
             null[k] += w * rho_perm
 
     resultados = {}
+    nulos_completos = {}
     for k in lags:
         if peso[k] == 0:
             continue
         obs = num_obs[k] / peso[k]
         nulo = null[k] / peso[k]
+        nulos_completos[k] = nulo
         media = float(nulo.mean())
         p_lo = float(np.percentile(nulo, 2.5))
         p_hi = float(np.percentile(nulo, 97.5))
@@ -192,4 +198,6 @@ def prueba_permutacion(secuencias, lags, B: int = 1000, rng=None) -> dict:
             "p_una_cola_sup": p_sup,
             "significativo": (obs < p_lo) or (obs > p_hi),
         }
+    if devolver_nulo:
+        resultados["_nulo"] = nulos_completos
     return resultados
