@@ -71,6 +71,21 @@ def gaps_vecino(gammas: np.ndarray) -> np.ndarray:
     return np.diff(unfold(gammas))
 
 
+def unfold_densidad_local(gammas: np.ndarray) -> np.ndarray:
+    """Unfolding por densidad LOCAL, gap a gap (forma estándar para Odlyzko):
+
+        s_n = (γ_{n+1} − γ_n) · log(γ_n / 2π) / (2π)
+
+    El factor log(γ/2π)/(2π) es la densidad media local de ceros a la altura γ, así que
+    s_n tiene media ≈ 1 localmente, sin importar la altura. Equivale (a primer orden) a
+    diferenciar N_suave, pero se expresa por gap. Es el método por defecto a alta altura.
+    """
+    g = np.asarray(gammas, dtype=np.float64)
+    gaps = np.diff(g)
+    dens = np.log(g[:-1] / DOS_PI) / DOS_PI
+    return gaps * dens
+
+
 def gaps_normalizacion_global_INCORRECTA(gammas: np.ndarray) -> np.ndarray:
     """MÉTODO INCORRECTO (solo para exhibir el confounder en el reporte).
 

@@ -32,3 +32,7 @@ htmlcov/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Datos crudos de Odlyzko (grandes; se obtienen con scripts/, no se versionan)
+data/odlyzko/zeros6
+data/odlyzko/zeros6.gz

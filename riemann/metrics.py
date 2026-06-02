@@ -71,25 +71,25 @@ def r2_teorico_gue(r):
 def correlacion_pares(unfolded, r_max=3.0, dr=0.1):
     """Correlación de pares empírica de puntos unfolded (densidad media 1).
 
-    Para cada punto se cuentan los vecinos a distancia ≤ r_max; el histograma de
-    diferencias positivas se normaliza por (N·dr), que es el conteo esperado bajo
-    densidad 1 sin correlación. Devuelve (centros_r, R_2_empírico).
+    El conteo de pares ordenados (i<j) con separación ≤ r se obtiene VECTORIZADO con
+    búsqueda binaria: C(r) = Σ_i (#{j>i : w_j ≤ w_i + r}). El histograma en [r, r+dr] es
+    C(r+dr) − C(r), normalizado por (N·dr) = conteo esperado bajo densidad 1 sin
+    correlación. Escala a millones de puntos (≈ n_bins búsquedas binarias sobre N).
+    Devuelve (centros_r, R_2_empírico).
     """
     w = np.sort(np.asarray(unfolded, dtype=np.float64))
     N = len(w)
     bordes = np.arange(0.0, r_max + dr, dr)
-    conteo = np.zeros(len(bordes) - 1)
-    # Suma de diferencias dentro de r_max usando una ventana deslizante.
-    for i in range(N):
-        j = i + 1
-        while j < N and (w[j] - w[i]) <= r_max:
-            j += 1
-        difs = w[i + 1:j] - w[i]
-        if difs.size:
-            conteo += np.histogram(difs, bins=bordes)[0]
+    indices = np.arange(N)
+
+    def C(r):
+        hi = np.searchsorted(w, w + r, side="right")
+        return float(np.clip(hi - indices - 1, 0, None).sum())
+
+    acum = np.array([C(r) for r in bordes])
+    conteo = np.diff(acum)
     centros = 0.5 * (bordes[:-1] + bordes[1:])
-    r2 = conteo / (N * dr)
-    return centros, r2
+    return centros, conteo / (N * dr)
 
 
 # ---------------------------------------------------------------------------

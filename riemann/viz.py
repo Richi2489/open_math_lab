@@ -87,6 +87,65 @@ def pares_r2(centros, r2_emp, ruta="outputs/riemann_r2.png") -> str:
     return ruta
 
 
+def cdf_diferencia(s_zeta, s_gue, ruta, x_max=4.0) -> str:
+    """Diferencia de CDF empíricas F_ζ(x) − F_GUE(x) (la 'firma' del residuo)."""
+    _asegurar_dir(ruta)
+    x = np.linspace(0, x_max, 400)
+    sz = np.sort(np.asarray(s_zeta, dtype=np.float64))
+    sg = np.sort(np.asarray(s_gue, dtype=np.float64))
+    Fz = np.searchsorted(sz, x, side="right") / len(sz)
+    Fg = np.searchsorted(sg, x, side="right") / len(sg)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(x, Fz - Fg, color="#3b6ea5", lw=1.5)
+    ax.axhline(0.0, color="black", lw=0.8)
+    ax.set_xlabel("espaciado normalizado s")
+    ax.set_ylabel("F_ζ(s) − F_GUE(s)")
+    ax.set_title("Diferencia de CDF (ζ Odlyzko − GUE)")
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
+def metricas_por_ventana(centros_T, ks, wass, ruta) -> str:
+    """KS y Wasserstein (ζ vs GUE) por ventana de altura."""
+    _asegurar_dir(ruta)
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(11, 4.5))
+    a1.plot(centros_T, ks, "o-", color="#3b6ea5", lw=1.5)
+    a1.set_xlabel("altura T (centro de ventana)")
+    a1.set_ylabel("KS(ζ vs GUE)")
+    a1.set_title("KS por ventana de altura")
+    a1.grid(True, alpha=0.3)
+    a2.plot(centros_T, wass, "o-", color="#5a9367", lw=1.5)
+    a2.set_xlabel("altura T (centro de ventana)")
+    a2.set_ylabel("Wasserstein(ζ vs GUE)")
+    a2.set_title("Wasserstein por ventana de altura")
+    a2.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
+def comparar_datasets(etiquetas, valores, ruta, ylabel="Wasserstein(ζ vs GUE)") -> str:
+    """Barras de una métrica de desviación a GUE a través de datasets/ventanas
+    (p.ej. baja altura mpmath vs Odlyzko alta-T)."""
+    _asegurar_dir(ruta)
+    x = range(len(etiquetas))
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.bar(list(x), valores, color="#3b6ea5", alpha=0.85)
+    ax.set_xticks(list(x))
+    ax.set_xticklabels(etiquetas, rotation=20, ha="right", fontsize=8)
+    ax.set_ylabel(ylabel)
+    ax.set_title("Desviación a GUE: baja altura vs Odlyzko alta-T")
+    ax.grid(True, axis="y", alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
 def tendencia_altura(centros_T, var_gap, ks, ruta="outputs/riemann_tendencia_altura.png") -> str:
     """Dos paneles: |brecha de varianza ζ−GUE| y KS(ζ vs GUE) por cuartil de altura.
     Si la brecha encoge al subir T, es efecto de altura finita."""

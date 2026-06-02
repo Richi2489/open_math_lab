@@ -130,18 +130,31 @@ Laboratorio estadístico reproducible de la conexión **Montgomery–Odlyzko**.
 > la media global, en vez de por la densidad local `N(T)`, fabrica artefactos de escala.
 
 - Plan y **regla anti-autoengaño pre-registrada**: [`docs/riemann_lab_plan.md`](docs/riemann_lab_plan.md)
-- Reporte de la iteración 1: [`docs/spacing_replication_report.md`](docs/spacing_replication_report.md)
+- Reporte iteración 1 (mpmath, ~10³): [`docs/spacing_replication_report.md`](docs/spacing_replication_report.md)
+- Descarga de la regla (unfolding exacto + altura): [`docs/unfolding_height_check_report.md`](docs/unfolding_height_check_report.md)
+- Reporte iteración 2 (Odlyzko, ~10⁶): [`docs/odlyzko_highT_report.md`](docs/odlyzko_highT_report.md)
 
-**Resultado iteración 1:** repulsión tipo GUE **reproducida limpiamente** en las tres
-métricas (espaciados de vecino más cercano vs sorpresa de Wigner; KS/Wasserstein mucho
-más cerca de GUE que de Poisson; correlación de pares R₂ con el hoyo de repulsión en
-`r→0`). El residuo frente al GUE asintótico es compatible con tamaño finito / baja altura.
+**Resultado iteración 1:** repulsión tipo GUE **reproducida limpiamente** en tres métricas
+(espaciados de vecino más cercano vs sorpresa de Wigner; KS/Wasserstein mucho más cerca de
+GUE que de Poisson; correlación de pares R₂ con el hoyo de repulsión en `r→0`).
+
+**Resultado iteración 2 — réplica confirmada:** subiendo la altura de ~10³ a ~10⁶ con los
+2,001,052 ceros de Odlyzko (`zeros6`), la pequeña desviación ζ−GUE de baja altura **encoge**
+monótonamente (|Δvar| 0.034 → 0.016; Wasserstein 0.035 → 0.016), Poisson queda descartado por
+amplio margen, y la desviación decrece por ventanas de altura. El p-valor minúsculo del KS a
+2M es la **trampa de muestra grande** (pre-registrada), no una anomalía: es la corrección
+conocida de altura finita al GUE. La conexión Montgomery–Odlyzko queda **reproducida
+limpiamente** (réplica empírica de un resultado conocido, no evidencia sobre RH).
 
 ```powershell
-# Réplica (N=2000 ceros; la 1ª vez computa con mpmath ~6 min y cachea en data/)
+# Iteración 1 (N=2000 ceros vía mpmath; cachea en data/)
 python scripts/run_spacing_replication.py --n-ceros 2000
-python scripts/run_spacing_replication.py --rapido   # versión chica
+
+# Iteración 2 (alta altura; requiere el archivo local de Odlyzko zeros6 en data/odlyzko/)
+python scripts/run_odlyzko_highT.py --n 2000000 --gue-samples 40
 ```
 
-Los ceros se cachean en `data/` (incremental: no se recomputan). Hay un hook dejado para
-ingerir tablas de Odlyzko de alta altura `T` en una iteración futura (sin descargas aún).
+Los ceros de mpmath se cachean en `data/`. El dataset de Odlyzko (`zeros6`, ~36 MB) **no se
+versiona** (está en `.gitignore`); se obtiene de las
+[tablas de Odlyzko](https://www-users.cse.umn.edu/~odlyzko/zeta_tables/) y se coloca en
+`data/odlyzko/`. El script lee el archivo local; no descarga en runtime.
