@@ -14,6 +14,7 @@ Submódulos:
     viz    : gráficas (trayectorias log, histograma de tiempos, autocorrelación).
 """
 
+from . import acf, sampling, stats, viz
 from .engine import (
     trayectoria,
     tiempo_total_parada,
@@ -30,6 +31,10 @@ __all__ = [
     "paso_acelerado",
     "paso_acelerado_vector",
     "secuencia_v",
+    "acf",
+    "sampling",
+    "stats",
+    "viz",
 ]
 
 __version__ = "0.1.0"

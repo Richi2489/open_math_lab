@@ -89,11 +89,18 @@ def paso_acelerado(n: int) -> tuple[int, int]:
     return m >> v, v
 
 
-def secuencia_v(n: int) -> np.ndarray:
+def secuencia_v(n: int, max_iter: int | None = None) -> np.ndarray:
     """Secuencia de v's a lo largo de la trayectoria acelerada de `n` hasta llegar a 1.
 
     Si `n` es par, primero se reduce a impar (se descartan esos factores de 2,
     que no aportan información sobre la dinámica del mapa acelerado).
+
+    Usa enteros nativos de Python (precisión arbitraria): los picos de trayectoria
+    NO desbordan, sin importar el número de bits del arranque.
+
+    `max_iter`: si se indica, lanza RuntimeError al superar ese número de pasos.
+    Es solo un cinturón de seguridad: para arranques < 2^71 la terminación está
+    garantizada por la verificación de la conjetura por supercómputo.
     """
     n = int(n)
     if n < 1:
@@ -104,6 +111,8 @@ def secuencia_v(n: int) -> np.ndarray:
     while n != 1:
         n, v = paso_acelerado(n)
         vs.append(v)
+        if max_iter is not None and len(vs) >= max_iter:
+            raise RuntimeError(f"secuencia_v excedió max_iter={max_iter}.")
     return np.asarray(vs, dtype=np.int64)
 
 
@@ -129,7 +138,15 @@ def paso_acelerado_vector(n: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     hasta ~2^40, el cálculo 3n+1 cabe holgadamente en int64 sin desbordar.
     """
     n = np.asarray(n, dtype=np.int64)
+    if n.size and n.max() >= (1 << 61):
+        # 3n+1 podría rebasar int64 (~9.2e18) y desbordar EN SILENCIO. Abortar.
+        raise OverflowError(
+            "paso_acelerado_vector: n demasiado grande para int64 (usa el motor de "
+            "enteros de Python, p.ej. secuencia_v, para arranques de muchos bits)."
+        )
     m = 3 * n + 1
+    if (m <= 0).any():  # detección defensiva de desbordamiento (envoltura a negativo)
+        raise OverflowError("paso_acelerado_vector: overflow detectado en 3n+1.")
     v = valuacion_2_vector(m)
     siguiente = m >> v
     return siguiente, v
