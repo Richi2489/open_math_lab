@@ -52,6 +52,39 @@ def espaciados_gue(n: int, rng, n_matrices: int = 1, recorte: float = 0.1) -> np
     return np.concatenate(todos)
 
 
+def matriz_goe(n: int, rng) -> np.ndarray:
+    """Matriz GOE n×n: A real gaussiano, H = (A + Aᵀ)/√2 (real simétrica).
+
+    Con esta normalización, E[H_ij²]=1 (i≠j) y E[H_ii²]=2, de modo que los autovalores
+    de H/√n tienden a la ley del semicírculo en [−2, 2] (igual que GUE), pero la simetría
+    es ortogonal: la repulsión de niveles es LINEAL (β=1), no cuadrática.
+    """
+    A = rng.standard_normal((n, n))
+    return (A + A.T) / np.sqrt(2.0)
+
+
+def espaciados_goe(n: int, rng, n_matrices: int = 1, recorte: float = 0.1) -> np.ndarray:
+    """Espaciados de vecino más cercano de GOE finito (n×n), unfolded por semicírculo.
+
+    Es el baseline de un billar caótico con simetría de inversión temporal (como el
+    estadio): repulsión lineal P(s)∼s, varianza ≈ 0.27.
+    """
+    todos = []
+    lo, hi = int(recorte * n), int((1.0 - recorte) * n)
+    for _ in range(n_matrices):
+        lam = np.linalg.eigvalsh(matriz_goe(n, rng)) / np.sqrt(n)
+        u = n * cdf_semicirculo(lam)
+        u.sort()
+        todos.append(np.diff(u[lo:hi]))
+    return np.concatenate(todos)
+
+
+def wigner_goe(s):
+    """Sorpresa de Wigner para GOE: P(s) = (π/2) s exp(−π s²/4) (repulsión lineal)."""
+    s = np.asarray(s, dtype=np.float64)
+    return (np.pi / 2.0) * s * np.exp(-np.pi * s ** 2 / 4.0)
+
+
 def espaciados_poisson(n_spac: int, rng) -> np.ndarray:
     """Baseline Poisson: gaps exponenciales i.i.d. de media 1 (sin repulsión)."""
     return rng.exponential(1.0, size=int(n_spac))

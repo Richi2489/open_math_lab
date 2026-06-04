@@ -19,7 +19,8 @@ reproducibles (semilla fija) y su reporte en `docs/`.
 | Lab | Pregunta | Estado |
 |-----|----------|--------|
 | [`collatz/`](collatz/) | ¿Hay dependencia de corto alcance (lag-1) en la dinámica impar de Collatz, más allá de la heurística i.i.d.? | **Cerrado** — artefacto de tamaño finito (ver abajo) |
-| [`riemann/`](riemann/) | ¿Reproducimos limpiamente la repulsión tipo GUE (Montgomery–Odlyzko) en los gaps *unfolded* de los ceros de ζ? | Iteración 1 |
+| [`riemann/`](riemann/) | ¿Reproducimos limpiamente la repulsión tipo GUE (Montgomery–Odlyzko) en los gaps *unfolded* de los ceros de ζ? | Réplica confirmada (iter1+2) + cierre conceptual |
+| [`billiards/`](billiards/) | ¿La repulsión de niveles (caos → GOE) aparece sólo al volver caótica la geometría, con el mismo solver? (Bohigas–Giannoni–Schmit) | Iteración 1 — reproducido |
 
 ---
 
