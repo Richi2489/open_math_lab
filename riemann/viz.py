@@ -146,6 +146,50 @@ def comparar_datasets(etiquetas, valores, ruta, ylabel="Wasserstein(ζ vs GUE)")
     return ruta
 
 
+def formula_explicita_panel(x, psi_ex, curvas_por_N, ruta) -> str:
+    """La figura de la §4: ψ(x) exacta (escalera de primos) vs su reconstrucción por la
+    fórmula explícita con N ceros crecientes. Panel 2×2."""
+    _asegurar_dir(ruta)
+    x = np.asarray(x, dtype=np.float64)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), sharex=True, sharey=True)
+    for ax, (N, ap) in zip(axes.ravel(), curvas_por_N):
+        ax.plot(x, psi_ex, color="black", lw=1.3, label="ψ(x) exacta (primos)")
+        ax.plot(x, ap, color="#3b6ea5", lw=1.0, label=f"fórmula explícita, N={N}")
+        ax.set_title(f"N = {N} ceros")
+        ax.set_ylabel("ψ(x)")
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8, loc="upper left")
+    for ax in axes[-1]:
+        ax.set_xlabel("x")
+    fig.suptitle("Reconstrucción del conteo de primos ψ(x) desde los ceros de ζ "
+                 "(fórmula explícita de Riemann)", fontsize=12)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
+def formula_explicita_gibbs(x, psi_ex, curvas_por_N, ruta) -> str:
+    """Zoom cerca de unos saltos para mostrar el fenómeno de Gibbs (overshoot) como
+    comportamiento esperado de la suma truncada, no como error."""
+    _asegurar_dir(ruta)
+    x = np.asarray(x, dtype=np.float64)
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(x, psi_ex, color="black", lw=1.6, label="ψ(x) exacta")
+    colores = ["#ccdcea", "#9bbcd8", "#5a86b4", "#23496e"]
+    for (N, ap), c in zip(curvas_por_N, colores):
+        ax.plot(x, ap, color=c, lw=1.1, label=f"N={N}")
+    ax.set_xlabel("x")
+    ax.set_ylabel("ψ(x)")
+    ax.set_title("Fenómeno de Gibbs cerca de los saltos (esperado, no es error)")
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(ruta, dpi=130)
+    plt.close(fig)
+    return ruta
+
+
 def silueta_conteo(t_zeros, ruta, n_zeros=400) -> str:
     """A.1: escalera real N(t)=#{t_n≤t} de los ceros vs el conteo semiclásico de xp
     (= parte suave de Riemann–von Mangoldt). Coinciden en promedio → la SILUETA."""

@@ -134,6 +134,7 @@ Laboratorio estadístico reproducible de la conexión **Montgomery–Odlyzko**.
 - Descarga de la regla (unfolding exacto + altura): [`docs/unfolding_height_check_report.md`](docs/unfolding_height_check_report.md)
 - Reporte iteración 2 (Odlyzko, ~10⁶): [`docs/odlyzko_highT_report.md`](docs/odlyzko_highT_report.md)
 - Cierre conceptual — el operador `xp` de Berry–Keating ("Touching the Wall"): [`docs/riemann_missing_operator.md`](docs/riemann_missing_operator.md)
+- Los ceros reconstruyen los primos (fórmula explícita de Riemann): [`docs/explicit_formula.md`](docs/explicit_formula.md)
 
 **Resultado iteración 1:** repulsión tipo GUE **reproducida limpiamente** en tres métricas
 (espaciados de vecino más cercano vs sorpresa de Wigner; KS/Wasserstein mucho más cerca de

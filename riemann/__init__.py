@@ -16,6 +16,6 @@ Submódulos:
     viz     : figuras (espaciados, R_2, estabilidad).
 """
 
-from . import gue, metrics, odlyzko, spacing, xp, zeros
+from . import explicit_formula, gue, metrics, odlyzko, spacing, xp, zeros
 
-__all__ = ["zeros", "spacing", "gue", "metrics", "odlyzko", "xp"]
+__all__ = ["zeros", "spacing", "gue", "metrics", "odlyzko", "xp", "explicit_formula"]
